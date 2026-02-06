@@ -1,199 +1,414 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Dust Programming Language (DPL) — a unified language for classical, quantum, and phase-based computation." />
   <title>Dust Programming Language (DPL)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <meta name="description" content="Dust Programming Language (DPL) — a phase-native, cross-architecture language spanning classical, quantum, and phase computation." />
 
   <style>
-    :root {
-      --bg: #0b0e14;
-      --fg: #e6e9ef;
-      --muted: #9aa4b2;
-      --accent: #7cf3c0;
-      --code: #111726;
-      --border: #1e2433;
+    :root{
+      --bg:#07080b;
+      --panel:#0c0f16;
+      --panel2:#0a0c12;
+      --text:#e7e8ee;
+      --muted:#a8adbd;
+      --line:rgba(255,255,255,.10);
+      --accent:#7c5cff;
+      --accent2:#00d4ff;
+      --ok:#3cff8b;
+      --warn:#ffcc66;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% 10%, rgba(124,92,255,.18), transparent 55%),
+        radial-gradient(1200px 700px at 85% 20%, rgba(0,212,255,.10), transparent 55%),
+        radial-gradient(900px 500px at 50% 100%, rgba(60,255,139,.06), transparent 60%),
+        linear-gradient(180deg, var(--bg), #04050a);
+      letter-spacing:.2px;
+    }
+    a{color:inherit}
+    .wrap{max-width:1100px;margin:0 auto;padding:28px 18px 60px}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:14px; padding:10px 14px; border:1px solid var(--line);
+      border-radius:14px;background:rgba(12,15,22,.55); backdrop-filter: blur(10px);
+      position:sticky; top:10px; z-index:50;
+    }
+    .brand{display:flex;align-items:center;gap:10px;min-width:230px}
+    .logo{
+      width:36px;height:36px;border-radius:12px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 35%),
+        linear-gradient(135deg, rgba(124,92,255,.90), rgba(0,212,255,.70));
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow: 0 0 0 1px rgba(124,92,255,.20), 0 10px 30px rgba(0,0,0,.35);
+      display:grid;place-items:center;
+      font-weight:700;
+    }
+    .brand h1{font-size:14px;margin:0;line-height:1.1}
+    .brand p{margin:0;font-size:12px;color:var(--muted)}
+    nav{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+    nav a{
+      text-decoration:none;
+      font-size:12px;color:var(--muted);
+      padding:8px 10px;border-radius:10px;border:1px solid transparent;
+    }
+    nav a:hover{
+      color:var(--text);
+      border-color:rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
     }
 
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                   Roboto, Inter, Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--fg);
-      line-height: 1.6;
+    .hero{
+      margin-top:18px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(12,15,22,.75), rgba(10,12,18,.55));
+      padding:26px 18px;
+      overflow:hidden;
+      position:relative;
+    }
+    .hero:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(600px 220px at 20% 0%, rgba(124,92,255,.22), transparent 60%),
+        radial-gradient(600px 220px at 90% 10%, rgba(0,212,255,.18), transparent 60%);
+      pointer-events:none;
+    }
+    .hero .grid{
+      position:relative;
+      display:grid; gap:18px;
+      grid-template-columns: 1.2fr .8fr;
+    }
+    @media (max-width: 900px){
+      .hero .grid{grid-template-columns:1fr}
+      .brand{min-width:auto}
+    }
+    .title{margin:0;font-size:34px;line-height:1.05;letter-spacing:.2px}
+    .subtitle{
+      margin:10px 0 0; color:var(--muted);
+      font-size:14px; max-width:60ch;
+    }
+    .badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .badge{
+      font-size:12px; color:var(--text);
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      padding:6px 10px;border-radius:999px;
+    }
+    .badge strong{color:var(--ok);font-weight:700}
+    .ctaRow{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;
+      text-decoration:none;
+      padding:10px 12px;border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      font-size:13px;
+    }
+    .btn:hover{background:rgba(255,255,255,.06)}
+    .btn.primary{
+      border-color: rgba(124,92,255,.45);
+      background: linear-gradient(135deg, rgba(124,92,255,.25), rgba(0,212,255,.14));
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    }
+    .btn .dot{
+      width:8px;height:8px;border-radius:50%;
+      background:var(--accent2); box-shadow:0 0 0 3px rgba(0,212,255,.15);
     }
 
-    header {
-      padding: 4rem 1.5rem 3rem;
-      text-align: center;
-      border-bottom: 1px solid var(--border);
+    .card{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:rgba(12,15,22,.55);
+      padding:14px 14px 12px;
+      position:relative;
     }
+    .card h3{margin:0 0 6px;font-size:13px;letter-spacing:.2px}
+    .card p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.5}
+    .stack{display:grid;gap:12px}
 
-    header h1 {
-      font-size: 3rem;
-      margin: 0;
-      letter-spacing: -0.03em;
+    section{margin-top:18px}
+    .sectionHead{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+      margin:22px 2px 10px;
     }
+    .sectionHead h2{margin:0;font-size:16px;letter-spacing:.3px}
+    .sectionHead span{color:var(--muted);font-size:12px}
+    .twoCol{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+    @media (max-width: 900px){.twoCol{grid-template-columns:1fr}}
 
-    header p {
-      max-width: 720px;
-      margin: 1.25rem auto 0;
-      color: var(--muted);
-      font-size: 1.15rem;
+    .mono{
+      font-family:var(--mono);
+      font-size:12px; line-height:1.55;
+      color:#d7dbef;
+      background:rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      padding:12px;
+      overflow:auto;
+      white-space:pre;
     }
+    .list{
+      margin:0; padding-left:16px; color:var(--muted); font-size:13px; line-height:1.6;
+    }
+    .list li{margin:6px 0}
+    .pillRow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .pill{
+      font-size:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+      padding:6px 10px;border-radius:999px;
+    }
+    .pill b{color:var(--text);font-weight:600}
 
-    main {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 3rem 1.5rem 5rem;
+    footer{
+      margin-top:26px;
+      border-top:1px solid var(--line);
+      padding-top:14px;
+      color:var(--muted);
+      font-size:12px;
+      display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;
     }
-
-    section {
-      margin-bottom: 3.5rem;
-    }
-
-    h2 {
-      font-size: 1.6rem;
-      margin-bottom: 0.75rem;
-      letter-spacing: -0.02em;
-    }
-
-    p {
-      color: var(--fg);
-      max-width: 780px;
-    }
-
-    ul {
-      padding-left: 1.2rem;
-    }
-
-    li {
-      margin: 0.5rem 0;
-      color: var(--muted);
-    }
-
-    code, pre {
-      background: var(--code);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    }
-
-    pre {
-      padding: 1rem;
-      overflow-x: auto;
-      color: #cfd6e6;
-    }
-
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 2rem 1.5rem;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
+    .tinyLinks{display:flex;flex-wrap:wrap;gap:10px}
+    .tinyLinks a{color:var(--muted);text-decoration:none}
+    .tinyLinks a:hover{color:var(--text)}
   </style>
 </head>
 
 <body>
-  <header>
-    <h1>Dust Programming Language</h1>
-    <p>
-      DPL is an original, phase-native programming language designed to span
-      classical computation, quantum computation, and phase computation —
-      without inheriting legacy assumptions from existing languages.
-    </p>
-  </header>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">Φ</div>
+        <div>
+          <h1>Dust Programming Language</h1>
+          <p>DPL — unified classical · quantum · phase computation</p>
+        </div>
+      </div>
+      <nav>
+        <a href="#overview">Overview</a>
+        <a href="#principles">Principles</a>
+        <a href="#spec">Spec</a>
+        <a href="#documents">Documents</a>
+        <a href="#contributing">Contributing</a>
+      </nav>
+    </div>
 
-  <main>
-    <section>
-      <h2>What is DPL?</h2>
-      <p>
-        The Dust Programming Language (DPL) was created to give Dust LLC full
-        creative, architectural, and legal ownership over a computation stack
-        capable of expressing physical, quantum, and phase-based systems.
-      </p>
-      <p>
-        DPL is not a derivative language. It is designed from first principles
-        to support cross-architecture execution, formal phase semantics, and
-        long-term research evolution.
-      </p>
+    <header class="hero" id="overview">
+      <div class="grid">
+        <div>
+          <h2 class="title">Dust Programming Language (DPL)</h2>
+          <p class="subtitle">
+            A clean-slate language designed from first principles to support <b>classical</b>, <b>quantum</b>,
+            and <b>phase-based</b> computation in one coherent system—grounded in physical reality:
+            resources, time, irreversibility, and global consistency are explicit and first-class.
+          </p>
+
+          <div class="badges">
+            <div class="badge"><strong>v0.1</strong> language definition</div>
+            <div class="badge">spec is canonical law</div>
+            <div class="badge">determinism + auditability</div>
+            <div class="badge">constraint-first execution</div>
+          </div>
+
+          <div class="ctaRow">
+            <!-- Replace these href values with your actual repo/site links as needed -->
+            <a class="btn primary" href="https://github.com/dustlang/dustlang" target="_blank" rel="noreferrer">
+              <span class="dot"></span> View Repository
+            </a>
+            <a class="btn" href="#spec">Read the Spec Index</a>
+            <a class="btn" href="#documents">Documentation Map</a>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="card">
+            <h3>Regime-Typed Computation</h3>
+            <p>
+              Every executable process is explicitly in one regime:
+              <b>K</b> (classical), <b>Q</b> (quantum), or <b>Φ</b> (phase).
+              Regimes are interoperable, but boundaries are explicit and constrained.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Explicit Effects</h3>
+            <p>
+              Observation, emission, sealing, and coupling are never hidden.
+              Effects define the observable boundary of execution and enable deterministic replay.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Admissibility as Gatekeeper</h3>
+            <p>
+              Computation proceeds only when global constraints are satisfied.
+              Inadmissibility is explicit, terminal, and observable—never implicit “best effort.”
+            </p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="principles">
+      <div class="sectionHead">
+        <h2>Design Principles</h2>
+        <span>Small set · non-negotiable · enforced structurally</span>
+      </div>
+
+      <div class="twoCol">
+        <div class="card">
+          <h3>Core Principles</h3>
+          <ul class="list">
+            <li><b>Explicitness over inference</b>: nothing important is implied later.</li>
+            <li><b>Constraints before control flow</b>: validity is global before progress is local.</li>
+            <li><b>Determinism as a requirement</b>: observable behavior is reproducible and auditable.</li>
+            <li><b>Admissibility as gatekeeper</b>: computation proceeds only inside admissible space.</li>
+            <li><b>Implementation independence</b>: no compiler/runtime/back-end defines meaning.</li>
+            <li><b>Semantic stability</b>: evolution preserves meaning over novelty.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Regimes</h3>
+          <div class="pillRow">
+            <div class="pill"><b>K</b> — deterministic, time-aware computation</div>
+            <div class="pill"><b>Q</b> — linear, non-clonable resources</div>
+            <div class="pill"><b>Φ</b> — admissibility- and consistency-governed computation</div>
+          </div>
+          <p style="margin-top:10px;color:var(--muted);font-size:12.5px;line-height:1.6">
+            Dust unifies these regimes by making constraints, resources, time, and effects first-class—
+            while preserving strict boundaries where required.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="spec">
+      <div class="sectionHead">
+        <h2>Canonical Specification</h2>
+        <span>/spec is authoritative</span>
+      </div>
+
+      <div class="card">
+        <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.65">
+          The Dust language is defined by the specification directory. If any implementation or document disagrees
+          with the spec, the spec wins.
+        </p>
+        <div class="mono" style="margin-top:12px">
+dustlang/
+  spec/                        # Canonical language specification (LAW)
+  charter/                     # Authority, scope, admissibility
+  ir/                          # DIR: canonical semantic representation
+  vm/                          # DVM: reference execution semantics
+  compiler/                    # Compiler architecture & phase model
+  semantics/                   # Admissibility, effects, time semantics
+  security/                    # Security model
+  verification/                # Formal verification hooks
+  governance/                  # Versioning & semantic stability
+  research/                    # Interpretive research (non-normative)
+  guides/                      # Examples, book, migration (non-normative)
+        </div>
+      </div>
+    </section>
+
+    <section id="documents">
+      <div class="sectionHead">
+        <h2>Documentation Map</h2>
+        <span>Normative vs non-normative</span>
+      </div>
+
+      <div class="twoCol">
+        <div class="card">
+          <h3>Normative</h3>
+          <ul class="list">
+            <li><b>/spec</b> — language law (canonical definition)</li>
+            <li><b>/charter</b> — authority, scope, admissibility</li>
+            <li><b>/ir</b> — DIR specification (canonical meaning)</li>
+            <li><b>/vm</b> — DVM reference semantics (execution meaning)</li>
+            <li><b>/compiler</b> — phase model and determinism guarantees</li>
+            <li><b>/semantics</b> — admissibility, effects, time semantics</li>
+            <li><b>/security</b>, <b>/verification</b>, <b>/governance</b> — trust, proof, stability</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Non-Normative</h3>
+          <ul class="list">
+            <li><b>DPL_White_Paper.md</b> — vision & positioning</li>
+            <li><b>/research</b> — interpretive framing (no authority)</li>
+            <li><b>/guides</b> — examples, book, migration (illustrative only)</li>
+            <li><b>/archive</b> — deprecated / inadmissible materials</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="contributing">
+      <div class="sectionHead">
+        <h2>Contributing</h2>
+        <span>Meaning first · coherence always</span>
+      </div>
+
+      <div class="twoCol">
+        <div class="card">
+          <h3>Focus Areas</h3>
+          <ul class="list">
+            <li>spec clarity and internal consistency</li>
+            <li>error discovery and correction</li>
+            <li>examples that illustrate semantics (without defining them)</li>
+            <li>tooling that preserves canonical meaning and determinism</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Governance</h3>
+          <p>
+            Dust evolves under explicit governance to preserve semantic stability:
+            meaning is defined by the spec; compatibility is enforced structurally; implementations do not create precedent.
+          </p>
+          <div class="pillRow">
+            <div class="pill"><b>Authority</b>: charter/authority.md</div>
+            <div class="pill"><b>Scope</b>: charter/scope.md</div>
+            <div class="pill"><b>Admissibility</b>: charter/admissibility.md</div>
+            <div class="pill"><b>Stability</b>: governance/governance-and-stability.md</div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section>
-      <h2>Core Design Goals</h2>
-      <ul>
-        <li>Original syntax and semantics — no legacy language inheritance</li>
-        <li>Cross-architecture execution (classical, quantum, phase)</li>
-        <li>Phase-native abstractions as first-class constructs</li>
-        <li>Deterministic semantics where physically admissible</li>
-        <li>Designed for physics, engineering, and systems research</li>
-        <li>Open source under the Dust Open Source License</li>
-      </ul>
+      <div class="sectionHead">
+        <h2>Final Note</h2>
+        <span>Dust is a language for systems where meaning matters</span>
+      </div>
+
+      <div class="card">
+        <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.75">
+          If something is important, it must be explicit, constrained, and admissible.
+          Nothing else is allowed to happen.
+        </p>
+      </div>
     </section>
 
-    <section>
-      <h2>Example (Conceptual)</h2>
-      <pre><code>// DPL — illustrative example
-
-phase system Φ {
-  admissibility: global
-  coherence_limit: finite
-}
-
-process evolve Φ {
-  enforce phase.consistency
-  emit observable
-}</code></pre>
-      <p style="color: var(--muted); font-size: 0.95rem;">
-        Syntax shown is illustrative and subject to formal specification.
-      </p>
-    </section>
-
-    <section>
-      <h2>Open Source</h2>
-      <p>
-        DPL is released under the <strong>Dust Open Source License</strong>,
-        which preserves Dust LLC copyright, patents, and trademarks while
-        allowing open collaboration and derivative works under explicit terms.
-      </p>
-      <p>
-        All derived works must visibly acknowledge:
-        <br />
-        <strong>Copyright © Dust LLC</strong>
-      </p>
-    </section>
-
-    <section>
-      <h2>Project Status</h2>
-      <ul>
-        <li>Language specification — in active development</li>
-        <li>Formal white paper — published internally</li>
-        <li>Compiler and tooling — upcoming</li>
-        <li>Reference implementation — planned</li>
-      </ul>
-    </section>
-  </main>
-
-  <footer>
-    © Dust LLC — Dust Programming Language (DPL)<br />
-    <span style="color:#6f7787;">
-      This site is hosted via GitHub Pages.
-    </span>
-  </footer>
+    <footer>
+      <div>© 2026 Dust LLC · DPL</div>
+      <div class="tinyLinks">
+        <a href="#overview">Top</a>
+        <a href="https://github.com/dustlang/dustlang" target="_blank" rel="noreferrer">Repository</a>
+        <a href="#spec">Spec</a>
+        <a href="#documents">Docs</a>
+      </div>
+    </footer>
+  </div>
 </body>
 </html>
