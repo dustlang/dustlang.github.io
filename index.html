@@ -201,6 +201,7 @@
         <a href="#overview">Overview</a>
         <a href="#principles">Principles</a>
         <a href="#spec">Spec</a>
+        <a href="#implementations">v0.2 Tools</a>
         <a href="#documents">Documents</a>
         <a href="#contributing">Contributing</a>
       </nav>
@@ -217,7 +218,8 @@
           </p>
 
           <div class="badges">
-            <div class="badge"><strong>v0.1</strong> language definition</div>
+            <div class="badge"><strong>v0.2</strong> language definition</div>
+            <div class="badge"><strong>v0.2</strong> toolchain complete</div>
             <div class="badge">spec is canonical law</div>
             <div class="badge">determinism + auditability</div>
             <div class="badge">constraint-first execution</div>
@@ -242,6 +244,30 @@
               Regimes are interoperable, but boundaries are explicit and constrained.
             </p>
           </div>
+          <div class="card">
+            <h3>Explicit Effects</h3>
+            <p>
+              Observation, emission, sealing, and coupling are never hidden.
+              Effects define the observable boundary of execution and enable deterministic replay.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Admissibility as Gatekeeper</h3>
+            <p>
+              Computation proceeds only when global constraints are satisfied.
+              Inadmissibility is explicit, terminal, and observable—never implicit "best effort."
+            </p>
+          </div>
+          <div class="card">
+            <h3>v0.2 Toolchain</h3>
+            <p>
+              Complete toolchain now available:
+              <b>dust</b> (compiler), <b>dustdoc</b> (docs), <b>dustfmt</b> (formatter),
+              <b>dustpkg</b> (package manager), <b>dustrun</b> (runtime), <b>dusttest</b> (testing),
+              <b>dustviz</b> (visualization), and <b>dustlib_k</b> (K-regime stdlib).
+            </p>
+          </div>
+        </div>
           <div class="card">
             <h3>Explicit Effects</h3>
             <p>
@@ -318,6 +344,36 @@ dustlang/
   governance/                  # Versioning & semantic stability
   research/                    # Interpretive research (non-normative)
   guides/                      # Examples, book, migration (non-normative)
+        </div>
+      </div>
+    </section>
+
+    <section id="implementations">
+      <div class="sectionHead">
+        <h2>v0.2 Implementation Status</h2>
+        <span>All tools v0.2 compliant</span>
+      </div>
+
+      <div class="twoCol">
+        <div class="card">
+          <h3>Core Tools</h3>
+          <ul class="list">
+            <li><b>dust</b> — compiler (v0.2 compliant)</li>
+            <li><b>dustdoc</b> — documentation generator (v0.2)</li>
+            <li><b>dustfmt</b> — code formatter (v0.2)</li>
+            <li><b>dustpkg</b> — package manager (v0.2)</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Runtime & Tools</h3>
+          <ul class="list">
+            <li><b>dustrun</b> — runtime/DVM (v0.2)</li>
+            <li><b>dusttest</b> — testing framework (v0.2)</li>
+            <li><b>dustviz</b> — execution visualizer (v0.2)</li>
+            <li><b>dustlib</b> — core standard library (v0.2)</li>
+            <li><b>dustlib_k</b> — K-regime stdlib (v0.2)</li>
+          </ul>
         </div>
       </div>
     </section>
